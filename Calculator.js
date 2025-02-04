@@ -1,12 +1,9 @@
-let additionFlag = false;
-let minusFlag = false;
-let multiplyFlag = false;
-let divisionFlag = false;
 let successFlag = false;
 
-let firstValue = 0;
-let secondValue = 0;
-let output = 0;
+let currentValue = 0;
+let firstDigit = 0;
+let secondDigit = 0;
+let newValue = 0;
 
 function printNumber(value) {
     if (successFlag) {
@@ -24,54 +21,72 @@ function backtrack() {
     document.getElementById("result").value = newValue;
 }
 
-function storeFirstValue() {
-    if (document.getElementById("result").value) {
-        firstValue = +(document.getElementById("result").value);
-        document.getElementById("firstValue").value = firstValue;
-        document.getElementById("result").value = "";
-    }
-}
-
-function add() {
-    additionFlag = true;
-}
-
-function minus() {
-    minusFlag = true;
-}
-
-function multiply() {
-    multiplyFlag = true;
-}
-
-function divide() {
-    divisionFlag = true;
-}
-
 function clearInput() {
     document.getElementById("firstValue").value = "";
     document.getElementById("result").value = "";
 }
 
 function equals() {
-    secondValue = parseInt(document.getElementById("result").value);
-    
-    if (additionFlag) {
-        output = firstValue + secondValue;
-    } else if (minusFlag) {
-        output = firstValue - secondValue;
-    } else if (multiplyFlag) {
-        output = firstValue * secondValue;
-    } else if (divisionFlag) {
-        output = firstValue / secondValue;
+    currentValue = document.getElementById("result").value;
+
+    let currentValueArray = currentValue.split("");
+    console.log(currentValueArray);
+    console.log("count before:" + currentValueArray.length);
+    while (currentValueArray.length > 2) {
+        for (let i = 0; i < currentValueArray.length; i++) {
+            if (currentValueArray[i] == "/") {
+                // get values left and right of operator
+                firstDigit = currentValueArray[i - 1];
+                secondDigit = currentValueArray[i + 1];
+                newValue = firstDigit / secondDigit;
+
+                // updating left value with new value
+                currentValueArray[i - 1] = newValue;
+
+                // remove operator and right value
+                currentValueArray.splice(i, 2);
+            } else if (currentValueArray[i] == "*") {
+                // get values left and right of operator
+                firstDigit = currentValueArray[i - 1];
+                secondDigit = currentValueArray[i + 1];
+                newValue = firstDigit * secondDigit;
+
+                // updating left value with new value
+                currentValueArray[i - 1] = newValue;
+
+                // remove operator and right value
+                currentValueArray.splice(i, 2);
+            }
+        }
+
+        for (let i = 0; i < currentValueArray.length; i++) {
+            if (currentValueArray[i] == "+") {
+                // get values left and right of operator
+                firstDigit = +currentValueArray[i - 1];
+                secondDigit = +currentValueArray[i + 1];
+                newValue = firstDigit + secondDigit;
+
+                // updating left value with new value
+                currentValueArray[i - 1] = newValue;
+
+                // remove operator and right value
+                currentValueArray.splice(i, 2);
+            } else if (currentValueArray[i] == "-") {
+                // get values left and right of operator
+                firstDigit = +currentValueArray[i - 1];
+                secondDigit = +currentValueArray[i + 1];
+                newValue = firstDigit - secondDigit;
+
+                // updating left value with new value
+                currentValueArray[i - 1] = newValue;
+
+                // remove operator and right value
+                currentValueArray.splice(i, 2);
+            }
+        }
+        document.getElementById("result").value = currentValueArray[0];
+        console.log("after:" + currentValueArray.length);
     }
-
-    additionFlag = false;
-    minusFlag = false;
-    multiplyFlag = false;
-    divisionFlag = false;
-
-    document.getElementById("result").value = output;
 
     // resetting everything
     successFlag = true;
