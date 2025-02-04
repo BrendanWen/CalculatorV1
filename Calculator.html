@@ -10,8 +10,8 @@
     <div>
         <h1>Calculator</h1>
         <div>
-            <span>First Value: </span>
-            <input type="text" id="firstValue">
+            <span>Previous Value: </span>
+            <input type="text" id="previousValue">
         </div>
         <div>
             <span>Main Output: </span>
@@ -29,10 +29,14 @@
         <button id="buttonNine" value=9 onClick="printNumber(value)">9</button>
         <button id="buttonZero" value=0 onClick="printNumber(value)">0</button>
         <br>
-        <button id="buttonPlus" value=+ onClick="printNumber(value)">+</button>
-        <button id="buttonMinus" value=- onClick="printNumber(value)">-</button>
-        <button id="buttonSlash" value=* onClick="printNumber(value)">*</button>
-        <button id="buttonStar" value=/ onClick="printNumber(value)">/</button>
+        <button id="buttonDecimal" value=. onClick="decimal(value)">.</button>
+        <button id="buttonPercent" value=% onClick="percent(value)">%</button>
+        <button id="buttonPercent" value=( onClick="printNumber(value)">(</button>
+        <br>
+        <button id="buttonPlus" value=+ onClick="operator(value)">+</button>
+        <button id="buttonMinus" value=- onClick="operator(value)">-</button>
+        <button id="buttonSlash" value=* onClick="operator(value)">*</button>
+        <button id="buttonStar" value=/ onClick="operator(value)">/</button>
         <br>
         <button id="buttonEqual" onClick="equals()">=</button>
         <button id="buttonDelete" onClick="backtrack()">Del</button>
