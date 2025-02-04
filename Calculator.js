@@ -89,28 +89,38 @@ function clearInput() {
     hasSelectedOperator = true;
 }
 
+function updateArray(position) {
+    // updating left value with new value
+    currentValueArray[position - 1] = currentValue;
+    // remove operator and right value
+    currentValueArray.splice(position, 2);
+}
+
 function calculate(operator, position) {
+    // get values left and right of operator
+    firstDigit = +currentValueArray[position - 1];
+    secondDigit = +currentValueArray[position + 1];
+
     switch (operator) {
         case "/": {
-            // get values left and right of operator
-            firstDigit = currentValueArray[position - 1];
-            secondDigit = currentValueArray[position + 1];
             currentValue = firstDigit / secondDigit;
-            // updating left value with new value
-            currentValueArray[position - 1] = currentValue;
-            // remove operator and right value
-            currentValueArray.splice(position, 2);
-            console.log("value array after dividing: " + currentValueArray);
+            updateArray(position);
+            return currentValue;
+        }
+        case "*": {
+            currentValue = firstDigit * secondDigit;
+            updateArray(position);
+            return currentValue;
         }
         case "+": {
-            // get values left and right of operator
-            firstDigit = +currentValueArray[position - 1];
-            secondDigit = +currentValueArray[position + 1];
             currentValue = firstDigit + secondDigit;
-            // updating left value with new value
-            currentValueArray[position - 1] = currentValue;
-            // remove operator and right value
-            currentValueArray.splice(position, 2);
+            updateArray(position);
+            return currentValue;
+        }
+        case "-": {
+            currentValue = firstDigit - secondDigit;
+            updateArray(position);
+            return currentValue;
         }
     }
 }
@@ -125,36 +135,22 @@ function equals() {
 
     while (currentValueArray.length > 2) {
         for (let i = 0; i < currentValueArray.length; i++) {
+            // follow calculation priority
             if (currentValueArray[i] == "/") {
                 calculate("/", i);
             } else if (currentValueArray[i] == "*") {
-                // get values left and right of operator
-                firstDigit = currentValueArray[i - 1];
-                secondDigit = currentValueArray[i + 1];
-                currentValue = firstDigit * secondDigit;
-                // updating left value with new value
-                currentValueArray[i - 1] = currentValue;
-                // remove operator and right value
-                currentValueArray.splice(i, 2);
+                calculate("*", i);
             }
         }
         for (let i = 0; i < currentValueArray.length; i++) {
             if (currentValueArray[i] == "+") {
                 calculate("+", i);
             } else if (currentValueArray[i] == "-") {
-                // get values left and right of operator
-                firstDigit = +currentValueArray[i - 1];
-                secondDigit = +currentValueArray[i + 1];
-                currentValue = firstDigit - secondDigit;
-                // updating left value with new value
-                currentValueArray[i - 1] = currentValue;
-                // remove operator and right value
-                currentValueArray.splice(i, 2);
+                calculate("-", i);
             }
         }
-
-        document.getElementById("result").value = currentValue;
     }
+    document.getElementById("result").value = currentValue;
     // resetting everything
     successFlag = true;
     firstValue = 0;
