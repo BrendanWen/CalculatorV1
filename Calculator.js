@@ -2,6 +2,7 @@ let successFlag = false;
 let hasPushedDigit = false;
 let hasSelectedDecimal = false;
 let hasSelectedPercentage = false;
+let hasSelectedBracket = false;
 let hasSelectedOperator = true;
 
 let currentValue = "";
@@ -9,6 +10,7 @@ let currentValueArray = [];
 let firstDigit = 0;
 let secondDigit = 0;
 let finalValue = 0;
+let history = [];
 
 function printNumber(value) {
     if (successFlag) {
@@ -26,8 +28,8 @@ function printNumber(value) {
 }
 
 function decimal(value) {
-    while (!hasSelectedDecimal) {
-        // prevent duplicate decimals from happening
+    while (!hasSelectedDecimal && !successFlag) {
+        // prevent duplicate decimals from being called
         document.getElementById("result").value += value;
         currentValue += value;
         hasSelectedDecimal = true;
@@ -35,7 +37,7 @@ function decimal(value) {
 }
 
 function percent(value) {
-    while (!hasSelectedPercentage) {
+    while (!hasSelectedPercentage && !successFlag) {
         // all percentages are basically dividing by 100
         document.getElementById("result").value += value;
         currentValue /= 100;
@@ -43,12 +45,25 @@ function percent(value) {
     }
 }
 
-function bracket(value) {
-    document.getElementById("result").value += value;
-}
+// function bracket(value) {
+//     // check if an open bracket exists
+//     if (hasSelectedBracket && !successFlag) {
+//         currentValueArray.push(currentValue);
+//         currentValue = ")";
+//         document.getElementById("result").value += ")";
+//         currentValueArray.push(currentValue);
+//         console.log("Array after pressing bracket again: " + currentValueArray);
+//         return (hasSelectedBracket = false);
+//     } else if (!hasSelectedBracket && !successFlag) {
+//         document.getElementById("result").value += value;
+//         currentValueArray.push(value);
+//         console.log("Array pressing first bracket: " + currentValueArray);
+//         return (hasSelectedBracket = true);
+//     }
+// }
 
 function operator(value) {
-    while (!hasSelectedOperator) {
+    while (!hasSelectedOperator && !successFlag) {
         document.getElementById("result").value += value;
         currentValueArray.push(currentValue); // push existing digit value
         currentValueArray.push(value); // push operator value
@@ -61,22 +76,23 @@ function operator(value) {
     }
 }
 
-function bracket() {}
-
 function backtrack() {
-    let stringValue = document.getElementById("result").value;
-    let stringValueArray = stringValue.split("");
-    let poppedValue = stringValueArray.pop();
-    if ((poppedValue = /\d/)) {
-        // regex to detect digits from 0-9
-        hasSelectedOperator = false;
-    } else if (poppedValue == ".") {
-        hasSelectedDecimal = false;
-    } else if (poppedValue == "%") {
-        hasSelectedPercentage = false;
+    if (!successFlag) {
+        let splitValueArray = currentValue.split(""); // split the current value into individual digits
+        let poppedValue = splitValueArray.pop(); // pop the last digit
+        if ((poppedValue = /\d/)) {
+            // regex to detect digits from 0-9
+            hasSelectedOperator = false;
+        } else if (poppedValue == ".") {
+            hasSelectedDecimal = false;
+        } else if (poppedValue == "%") {
+            hasSelectedPercentage = false;
+        }
+        let newDeletedValue = splitValueArray.join(""); // combine the digits to form 1 integer
+        currentValue = newDeletedValue;
+        document.getElementById("result").value = // display the current array info along with the deleted value
+            currentValueArray.join("") + newDeletedValue;
     }
-    let newDeletedValue = stringValueArray.join("");
-    document.getElementById("result").value = newDeletedValue;
 }
 
 function clearInput() {
@@ -96,7 +112,7 @@ function updateArray(position) {
     currentValueArray.splice(position, 2);
 }
 
-function calculate(operator, position) {
+function operations(operator, position) {
     // get values left and right of operator
     firstDigit = +currentValueArray[position - 1];
     secondDigit = +currentValueArray[position + 1];
@@ -125,32 +141,40 @@ function calculate(operator, position) {
     }
 }
 
-function equals() {
-    // check if currentValue has been pushed to the array one time
-    if (!hasPushedDigit) {
-        currentValueArray.push(currentValue);
-        hasPushedDigit = true;
-        console.log("final value after refresh: " + currentValueArray);
-    }
-
+function runCalculations() {
     while (currentValueArray.length > 2) {
+        // do division and multiplication first, then plus and minus
         for (let i = 0; i < currentValueArray.length; i++) {
-            // follow calculation priority
             if (currentValueArray[i] == "/") {
-                calculate("/", i);
+                operations("/", i);
             } else if (currentValueArray[i] == "*") {
-                calculate("*", i);
+                operations("*", i);
             }
         }
         for (let i = 0; i < currentValueArray.length; i++) {
             if (currentValueArray[i] == "+") {
-                calculate("+", i);
+                operations("+", i);
             } else if (currentValueArray[i] == "-") {
-                calculate("-", i);
+                operations("-", i);
             }
         }
     }
-    document.getElementById("result").value = currentValue;
+}
+
+function equals() {
+    //check if currentValue is an operand
+    if (hasSelectedOperator) {
+        document.getElementById("result").value = "Invalid Output";
+    } else if (!hasPushedDigit) {
+        // check if currentValue has been pushed to the array for only one time
+        currentValueArray.push(currentValue);
+        hasPushedDigit = true;
+        console.log("final value after refresh: " + currentValueArray);
+        runCalculations();
+        document.getElementById("result").value = currentValue;
+    } else {
+        console.log("the end!");
+    }
     // resetting everything
     successFlag = true;
     firstValue = 0;
